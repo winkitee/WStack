@@ -1,23 +1,23 @@
 import SwiftUI
 
-public struct WStack<Content>: View where Content: View {
-    let data: [any Hashable]
+public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Content: View {
+    public var data: Data
     var alignment: HorizontalAlignment = .leading
     var spacing: CGFloat = 8
     var lineSpacing: CGFloat = 8
     var lineLimit: Int?
-    @ViewBuilder var content: (any Hashable) -> Content
+    @ViewBuilder var content: (Data.Element) -> Content
 
     @State private var framesOfIndecies: [Int: CGRect] = [:]
     @State private var frame: CGRect = CGRect()
 
     public init(
-        _ data: [any Hashable],
+        _ data: Data,
         alignment: HorizontalAlignment = .leading,
         spacing: CGFloat = 8,
         lineSpacing: CGFloat = 8,
         lineLimit: Int? = nil,
-        content: @escaping (any Hashable) -> Content
+        content: @escaping (Data.Element) -> Content
     ) {
         self.data = data
         self.alignment = alignment
@@ -38,7 +38,7 @@ public struct WStack<Content>: View where Content: View {
         GeometryReader { proxy in
             ZStack {
                 ForEach(0..<data.count, id: \.self) { i in
-                    content(data[i])
+                    content(data[i as! Data.Index])
                         .overlay(
                             GeometryReader { proxy in
                                 Color.clear.onAppear {
@@ -60,7 +60,7 @@ public struct WStack<Content>: View where Content: View {
         ForEach(matrix(), id: \.self) { items in
             HStack(spacing: spacing) {
                 ForEach(items, id: \.self) { i in
-                    content(data[i])
+                    content(data[i as! Data.Index])
                 }
             }
         }
