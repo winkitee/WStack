@@ -1,6 +1,18 @@
 # WStack
 
-This is a view that automatically wraps lines according to the horizontal screen size.
+WStack is a package for SwiftUI that provides a simple and intuitive way to wrap multiple views within an HStack. If you've ever struggled with aligning and spacing views within an HStack, this package can save you time and frustration.
+
+With Wrapping HStack, you can easily create a horizontal stack of views that automatically wraps to the next line when it reaches the edge of the screen. You can also adjust the spacing and alignment of the views within the HStack to fit your design needs.
+
+Features include:
+
+- Automatic wrapping of views within the HStack
+- Adjustable spacing and alignment of views
+- Compatible with SwiftUI
+
+Installation is simple and can be done via Swift Package Manager.
+
+Overall, WStack is a powerful and flexible package that can help simplify your SwiftUI development process and create more dynamic and responsive layouts.
 
 <img src="./example.png" width="50%" height="50%">
 
@@ -44,7 +56,6 @@ struct ContentView: View {
         "🧅 Onion",
         "🥔 Potato",
         "🍠 Roasted Sweet Potato"
-
     ]
 
     var body: some View {
