@@ -2,10 +2,11 @@ import SwiftUI
 
 public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Content: View {
     public var data: Data
-    var alignment: HorizontalAlignment = .leading
-    var spacing: CGFloat = 8
-    var lineSpacing: CGFloat = 8
+    var alignment: HorizontalAlignment
+    var spacing: CGFloat
+    var lineSpacing: CGFloat
     var lineLimit: Int?
+    var isHiddenLastItem: Bool
     @ViewBuilder var content: (Data.Element) -> Content
 
     @State private var framesOfIndecies: [Int: CGRect] = [:]
@@ -17,6 +18,7 @@ public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Co
         spacing: CGFloat = 8,
         lineSpacing: CGFloat = 8,
         lineLimit: Int? = nil,
+        isHiddenLastItem: Bool = false,
         content: @escaping (Data.Element) -> Content
     ) {
         self.data = data
@@ -24,6 +26,7 @@ public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Co
         self.spacing = spacing
         self.lineSpacing = lineSpacing
         self.lineLimit = lineLimit
+        self.isHiddenLastItem = isHiddenLastItem
         self.content = content
     }
 
@@ -79,6 +82,15 @@ public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Co
             }
 
             guard let width = framesOfIndecies[i]?.width else { continue }
+            if i == data.count - 1 && isHiddenLastItem {
+                if currentWidth + width + spacing > frame.width {
+                    result.append(currentRow)
+                    currentRow = [i]
+                    currentWidth = width
+                }
+                break
+            }
+
             if currentWidth + width + spacing <= frame.width {
                 currentWidth += width + spacing
                 currentRow.append(i)
@@ -91,6 +103,10 @@ public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Co
 
         if let lineLimit = lineLimit, lineLimit == result.count {
             lineLimitHandler(&result)
+            return result
+        }
+
+        if currentRow.count == 1 && currentRow.last == data.count - 1 && isHiddenLastItem {
             return result
         }
         result.append(currentRow)
@@ -113,7 +129,23 @@ public struct WStack<Data, Content>: View where Data: RandomAccessCollection, Co
             lastWidth -= (frame.width + spacing)
         }
 
-        lastRow.append(data.count - 1)
-        matrix[matrix.endIndex - 1] = lastRow
+        if count(matrix: matrix) < data.count - 1 {
+            lastRow.append(data.count - 1)
+            matrix[matrix.endIndex - 1] = lastRow
+        }
+
+        if lastRow.count == 1 && lastRow.last == data.count - 1 {
+            _ = matrix.popLast()
+        }
+    }
+
+    private func count(matrix: [[Int]]) -> Int {
+        var sum = 0
+        for array in matrix {
+            for _ in array {
+                sum += 1
+            }
+        }
+        return sum
     }
 }
